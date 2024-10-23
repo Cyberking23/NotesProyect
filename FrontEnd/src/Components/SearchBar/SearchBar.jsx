@@ -1,4 +1,4 @@
-import { FaM, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 
 export default function SearchBar({
@@ -14,7 +14,7 @@ export default function SearchBar({
         placeholder="Search Notes"
         className="w-full text-xs bg-transparent py-[11px] outline-none"
         value={value}
-        onChange={onchange}
+        onChange={onChange}
       />
 
       {value && (
