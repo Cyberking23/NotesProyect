@@ -1,18 +1,25 @@
 const jwt = require('jsonwebtoken');
 
+// Middleware to authenticate token
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers["authorization"]; // Acceso corregido al encabezado
-    const token = authHeader && authHeader.split(" ")[1]; // Asegúrate de que el token esté presente
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1]; // Get the token from the Authorization header
 
-    if (!token) return res.sendStatus(401); // Sin token, devuelve 401
+    if (!token) {
+        return res.sendStatus(401); // Unauthorized
+    }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Si hay un error en la verificación, devuelve 403
-        req.user = user; // Almacena el usuario en el objeto de solicitud
-        next(); // Continúa con el siguiente middleware
+        if (err) {
+            return res.sendStatus(403); // Forbidden
+        }
+        req.user = user; // Attach user data to the request
+        next();
     });
 }
 
+
+
+// Export the authenticateToken function
 module.exports = {
     authenticateToken,
 };
