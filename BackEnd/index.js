@@ -6,6 +6,8 @@ const mongoose = require("mongoose")
 mongoose.connect(config.connectionString)
 
 const User = require("./Models/user.model");
+const Note = require("./Models/note.model");
+
 
 const express = require("express");
 const cors = require("cors")
@@ -74,6 +76,76 @@ app.post("/create-account", async (req,res)=>{
         accessToken,
         message:"Registration Successfull"
     })
+})
+
+app.post("/login", async(req,resp)=>{
+    const {email,password}=req.body;
+    if(!email){
+        return resp.status(400).json({message:"Email is required"});
+    }
+
+    if(!password){
+        return resp.status(400).json({message:"Password is required"})
+    }
+
+    const userInfo = await User.findOne({email:email})
+
+    if(!userInfo){
+        return resp.status(400).json({message:"User not found"})
+    }
+
+    if(userInfo.email == email && userInfo.password == password){
+        const user ={user:userInfo}
+        const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{
+            expiresIn: "36000",
+        })
+        return resp.json({
+            error:false,
+            message:"Login Succesful",
+            email,
+            accessToken
+        })
+    }else{
+        return resp.status(400).json({
+            error:true,
+            message:"Invalid Credentialist"
+        })
+    }
+})
+
+app.post("/add-note", authenticateToken , async(req,resp)=>{
+    const {title,content,tags}=req.body
+    const {user}=req.user
+    
+    if(!title){
+        return resp.status(400).json({error:true,message:"Title is required"})
+    }
+    if(!content){
+        return resp 
+        .status(400)
+        .json({error:true,message:"Content is required"})
+    }
+
+    try{
+        const note = new Note({
+            title,content,
+            tags:tags || [],
+            userId: user._id
+        })
+
+        await note.save()
+
+        return resp.json({
+        error:false,
+        note,
+        message: "Note added succesfully",
+        })
+    } catch(error){
+        return resp.status(500).json({
+            error:true,
+            message:"Internal server error"
+        })
+    }
 })
 
 
