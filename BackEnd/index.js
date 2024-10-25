@@ -113,7 +113,43 @@ app.post("/login", async(req,resp)=>{
     }
 })
 
+app.post("/add-note", authenticateToken, async(req,resp)=>{
+    const {title,content,tags} = req.body
+    const {user}= req.body
 
+    if(!title){
+        return resp.status(400).json({error:true,message: "Title is required"})
+    }
+    if(!content){
+        return resp
+        .status(400)
+        .json({error:true, message: "Content is required"})
+    }
+
+    try{
+        const note = new Note({
+            title,
+            content,
+            tags: tags || [],
+            userId: user._id
+        })
+
+        await note.save()
+
+        return resp.json({
+            error: false,
+            note,
+            message: "Note added succesfully"
+        })
+
+    } catch(error){
+        return res.status(500).sjon({
+            error:true,
+            messaege: "Internal server Error"
+        })
+    }
+
+})
 
 
 
