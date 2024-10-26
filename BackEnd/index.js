@@ -108,44 +108,45 @@ app.post("/login", async (req, resp) => {
 });
 
 app.post("/add-note", authenticateToken, async (req, res) => {
-    const { title, content, tags } = req.body;
+  const { title, content, tags } = req.body;
 
+  console.log("Request Body:", req.body);
 
-    if (!title) {
-        return res.status(400).json({ error: true, message: "Title is required" });
-    }
+  if (!title) {
+      return res.status(400).json({ error: true, message: "Title is required" });
+  }
 
-    if (!content) {
-        return res.status(400).json({ error: true, message: "Content is required" });
-    }
+  if (!content) {
+      return res.status(400).json({ error: true, message: "Content is required" });
+  }
 
-    const user = req.user;
-    if (!user || !user.id) { // Check for user.id instead of user._id
-        return res.status(400).json({ error: true, message: "User ID is required" });
-    }
+  const user = req.user;
+  if (!user || !user.id) {
+      return res.status(400).json({ error: true, message: "User ID is required" });
+  }
 
-    try {
-        const note = new Note({
-            title,
-            content,
-            tags: tags || [],
-            userId: user.id, // Use user.id here
-        });
+  try {
+      const note = new Note({
+          title,
+          content,
+          tags: tags || [],
+          userId: user.id, // Usar el ID del usuario desde el objeto user
+      });
 
-        await note.save();
+      await note.save();
 
-        return res.json({
-            error: false,
-            note,
-            message: "Note added successfully",
-        });
-    } catch (error) {
-        console.error("Error adding note:", error);
-        return res.status(500).json({
-            error: true,
-            message: "Internal Server Error",
-        });
-    }
+      return res.json({
+          error: false,
+          note,
+          message: "Note added successfully",
+      });
+  } catch (error) {
+      console.error("Error adding note:", error);
+      return res.status(500).json({
+          error: true,
+          message: "Internal Server Error",
+      });
+  }
 });
 
 
