@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const config = require("./config.json");
 const mongoose = require("mongoose");
 
@@ -14,7 +14,6 @@ app.use(express.json());
 
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
-
 
 app.use(
   cors({
@@ -111,87 +110,45 @@ app.post("/add-note", authenticateToken, async (req, res) => {
   const { title, content, tags } = req.body;
 
   if (!title) {
-      return res.status(400).json({ error: true, message: "Title is required" });
+    return res.status(400).json({ error: true, message: "Title is required" });
   }
 
   if (!content) {
-      return res.status(400).json({ error: true, message: "Content is required" });
+    return res
+      .status(400)
+      .json({ error: true, message: "Content is required" });
   }
 
   const user = req.user;
   if (!user || !user.id) {
-      return res.status(400).json({ error: true, message: "User ID is required" });
+    return res
+      .status(400)
+      .json({ error: true, message: "User ID is required" });
   }
 
   try {
-      const note = new Note({
-          title,
-          content,
-          tags: tags || [],
-          userId: user.id, // Usar el ID del usuario desde el objeto user
-      });
+    const note = new Note({
+      title,
+      content,
+      tags: tags || [],
+      userId: user.id, // Usar el ID del usuario desde el objeto user
+    });
 
-      await note.save();
+    await note.save();
 
-      return res.json({
-          error: false,
-          note,
-          message: "Note added successfully",
-      });
+    return res.json({
+      error: false,
+      note,
+      message: "Note added successfully",
+    });
   } catch (error) {
-      console.error("Error adding note:", error);
-      return res.status(500).json({
-          error: true,
-          message: "Internal Server Error",
-      });
+    console.error("Error adding note:", error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+    });
   }
 });
-
-app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
-  const noteId = req.params.noteId;
-  const { title, content, tags, isPinned } = req.body;
-  const user = req.user;
-
-  console.log("User from request:", user); // Verifica qué contiene req.user
-
-  if (!title && !content && !tags) {
-      return res.status(400).json({ error: true, message: "No change Provided" });
-  }
-
-  // Verificar que user y user.id existan
-  if (!user || !user.id) { // Cambiado de user._id a user.id
-      return res.status(400).json({ error: true, message: "User ID is required" });
-  }
-
-  try {
-      const note = await Note.findOne({ _id: noteId, userId: user.id }); // Cambiado de user._id a user.id
-
-      if (!note) {
-          return res.status(404).json({ error: true, message: "Note not found" });
-      }
-
-      if (title) note.title = title;
-      if (content) note.content = content;
-      if (tags) note.tags = tags;
-      if (isPinned) note.isPinned = isPinned;
-
-      await note.save();
-
-      return res.json({
-          error: false,
-          note,
-          message: "Note updated successfully"
-      });
-  } catch (error) {
-      console.error("Error updating note:", error);
-      return res.status(500).json({
-          error: true,
-          message: "Internal Server Error"
-      });
-  }
-});
-
-
 
 
 
