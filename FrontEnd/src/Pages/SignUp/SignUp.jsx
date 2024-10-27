@@ -1,33 +1,66 @@
 import { useState } from "react";
 import NavBar from "../../Components/NavBar/NavBar";
 import PasswordInput from "../../Components/Input/PasswordInput";
-import {Link} from 'react-router-dom'
+import { Link,useNavigate  } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
+import axiosInstance from "../../utils/axiosInstance";
 
 function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    if(!name){
-      setError("Plese enter your name")
-      return
-    }
-
-    if(!validateEmail(email)){
-      setError("Plese Enter a valid Email address")
+    if (!name) {
+      setError("Plese enter your name");
       return;
     }
 
-    if(!password){
-      setError("Plese enter the password")
-      return
+    if (!validateEmail(email)) {
+      setError("Plese Enter a valid Email address");
+      return;
     }
 
-    setError('')
+    if (!password) {
+      setError("Plese enter the password");
+      return;
+    }
+
+    setError("");
+
+    //SignUp API call
+    try {
+      const response = await axiosInstance.post("/create-account", {
+        fullName:name,
+        email: email,
+        password: password,
+      });
+
+      if (response.data && response.data.error) {
+        setError(response.data.message)
+        return
+      }
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token",response.data.accessToken)
+        navigate("/dashboard")
+        return
+      }
+
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred .Plese try again");
+      }
+    }
   };
 
   return (
@@ -54,10 +87,10 @@ function SignUp() {
             />
 
             <PasswordInput
-            value={password}
-            onChange={(e)=>setPassword(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-             {error && <p className=" text-red-500 text-xs pb-1">{error}</p>}
+            {error && <p className=" text-red-500 text-xs pb-1">{error}</p>}
             <button type="submit" className="btn-primary">
               Create Account
             </button>
