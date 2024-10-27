@@ -8,7 +8,9 @@ function AddEditNotes({ noteData, type, onClose }) {
 
   const [error, setError] = useState(null);
 
-  const addNewNote = async () => {};
+  const addNewNote = async () => {
+    
+  };
 
   const editNote = async () => {};
   const handleAddNote = () => {

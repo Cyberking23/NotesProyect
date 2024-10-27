@@ -1,11 +1,13 @@
 import NoteCard from "../../Components/Cards/NoteCard";
 import Navbar from "../../Components/NavBar/NavBar";
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdSelectAll } from "react-icons/md";
 import AddEditNotes from "./AddEditNotes";
-import { useState,useEffect } from "react";
+import moment from "moment"
+import { useState, useEffect } from "react";
 import Modal from "react-modal";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
+import axios from "axios";
 
 function Home() {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -13,49 +15,67 @@ function Home() {
     type: "add",
     data: null,
   });
- 
-  const [userInfo , setUserInfo] = useState(null);
+
+  const [userInfo, setUserInfo] = useState(null);
+  const [allNotes, setAllNotes] = useState([]);
 
   const navigate = useNavigate();
 
   //GET USER INFO
 
-  const getUserInfo = async() =>{
-    try{
-      const response = await axiosInstance.get("/get-user")
-      if(response.data && response.data.user){
-        setUserInfo(response.data.user)
+  const getUserInfo = async () => {
+    try {
+      const response = await axiosInstance.get("/get-user");
+      if (response.data && response.data.user) {
+        setUserInfo(response.data.user);
       }
-    }catch(error){
-      if(error.response.status===401){
+    } catch (error) {
+      if (error.response.status === 401) {
         localStorage.clear();
-        navigate("/login")
+        navigate("/login");
       }
     }
-  }
+  };
 
-  useEffect(()=>{
+  //Get ALL notes
+
+  const getAllNotes = async () => {
+    try {
+      const response = await axiosInstance.get("/get-all-notes");
+
+      if (response.data && response.data.notes) {
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log("An unexpected error ocurred");
+    }
+  };
+
+  useEffect(() => {
+    getAllNotes();
     getUserInfo();
-    return () =>{}
-  },[])
+    return () => {};
+  }, []);
 
-  
   return (
     <>
-      <Navbar userInfo={userInfo}  />
+      <Navbar userInfo={userInfo} />
 
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8 ">
-          <NoteCard
-            title="Meeting on 7th April"
-            date="3rd apr 2024"
-            content="Meeting on 7th April Meetin on 7th April"
-            tags="#Meeting"
-            isPinned={true}
-            onEdit={() => {}}
-            onDelete={() => {}}
-            onPinNote={() => {}}
-          />
+          {allNotes.map((item, index) => (
+            <NoteCard
+              key ={item._id}
+              title={item.title}
+              date={moment(item.createdOn).format('Do MMM yyyy')}
+              content={item.content}
+              tags={item.tags}
+              isPinned={item.isPinned}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onPinNote={() => {}}
+            />
+          ))}
         </div>
       </div>
       <button
