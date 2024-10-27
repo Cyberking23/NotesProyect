@@ -6,6 +6,7 @@ function NavBar({userInfo}) {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const onLogout = () => {
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -31,7 +32,7 @@ function NavBar({userInfo}) {
         onClearSearch={onClearSearch}
       />
 
-      <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+      <ProfileInfo userInfo ={userInfo}  onLogout={onLogout} />
     </div>
   );
 }

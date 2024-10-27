@@ -13,20 +13,22 @@ function Home() {
     type: "add",
     data: null,
   });
-  const [userInfo,setUserInfo]= useState(null)
+ 
+  const [userInfo , setUserInfo] = useState(null);
 
   const navigate = useNavigate();
 
   //GET USER INFO
-  const getUserInfo = async () =>{
+
+  const getUserInfo = async() =>{
     try{
       const response = await axiosInstance.get("/get-user")
-      if(!response.data && response.data.user){
+      if(response.data && response.data.user){
         setUserInfo(response.data.user)
       }
     }catch(error){
-      if(error.response.status === 401){
-        localStorage.clear()
+      if(error.response.status===401){
+        localStorage.clear();
         navigate("/login")
       }
     }
@@ -34,14 +36,13 @@ function Home() {
 
   useEffect(()=>{
     getUserInfo();
-    return ()=>{}
+    return () =>{}
   },[])
 
-
-
+  
   return (
     <>
-      <Navbar userInfo={userInfo} />
+      <Navbar userInfo={userInfo}  />
 
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8 ">
