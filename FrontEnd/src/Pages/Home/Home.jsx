@@ -51,6 +51,10 @@ function Home() {
     }
   };
 
+  const handleEdit = (noteDetails) =>{
+    setOpenAddEditModal({isShown:true,data:noteDetails,type:"edit"})
+  }
+
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -71,7 +75,7 @@ function Home() {
               content={item.content}
               tags={item.tags}
               isPinned={item.isPinned}
-              onEdit={() => {}}
+              onEdit={() => handleEdit(item)}
               onDelete={() => {}}
               onPinNote={() => {}}
             />
@@ -104,6 +108,7 @@ function Home() {
           onClose={() => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}
+          getAllNotes={getAllNotes}
         />
       </Modal>
     </>
