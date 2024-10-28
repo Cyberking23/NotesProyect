@@ -2,7 +2,7 @@ import NoteCard from "../../Components/Cards/NoteCard";
 import Navbar from "../../Components/NavBar/NavBar";
 import { MdAdd, MdSelectAll } from "react-icons/md";
 import AddEditNotes from "./AddEditNotes";
-import moment from "moment"
+import moment from "moment";
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
@@ -51,9 +51,9 @@ function Home() {
     }
   };
 
-  const handleEdit = (noteDetails) =>{
-    setOpenAddEditModal({isShown:true,data:noteDetails,type:"edit"})
-  }
+  const handleEdit = (noteDetails) => {
+    setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
+  };
 
   useEffect(() => {
     getAllNotes();
@@ -69,9 +69,9 @@ function Home() {
         <div className="grid grid-cols-3 gap-4 mt-8 ">
           {allNotes.map((item, index) => (
             <NoteCard
-              key ={item._id}
+              key={item._id}
               title={item.title}
-              date={moment(item.createdOn).format('Do MMM yyyy')}
+              date={moment(item.createdOn).format("Do MMM yyyy")}
               content={item.content}
               tags={item.tags}
               isPinned={item.isPinned}
@@ -104,7 +104,7 @@ function Home() {
       >
         <AddEditNotes
           type={openAddEditModal.type}
-          noteDate={openAddEditModal.data}
+          noteData={openAddEditModal.data} // Updated prop name to be consistent
           onClose={() => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}

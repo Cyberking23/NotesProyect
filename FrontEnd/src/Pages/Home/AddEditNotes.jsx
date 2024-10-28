@@ -3,10 +3,10 @@ import TagInput from "../../Components/Input/TagInput";
 import { MdClose } from "react-icons/md";
 import axiosInstance from "../../utils/axiosInstance";
 
-function AddEditNotes({ noteData, type, onClose,getAllNotes }) {
-  const [title, setTitle] = useState();
-  const [content, setContent] = useState();
-  const [tags, setTags] = useState();
+function AddEditNotes({ noteData, type, onClose, getAllNotes }) {
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || ""); // Initialize content
+  const [tags, setTags] = useState(noteData?.tags || []); // Initialize tags
 
   const [error, setError] = useState(null);
 
@@ -17,27 +17,29 @@ function AddEditNotes({ noteData, type, onClose,getAllNotes }) {
         content,
         tags,
       });
-      if(response.data && response.data.note){
-        getAllNotes()
-        onClose()
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
       }
     } catch (error) {
-      if(error.response&&error.response.data&&error.response.data.message){
-        setError(error.response.data.message)
-      }
+      setError(
+        error.response?.data?.message || "An unexpected error occurred."
+      );
     }
   };
 
-  const editNote = async () => {};
+  const editNote = async () => {
+    // Your edit logic here
+  };
 
   const handleAddNote = () => {
     if (!title) {
-      setError("Plese enter the title");
+      setError("Please enter the title");
       return;
     }
 
     if (!content) {
-      setError("Plese enter the content");
+      setError("Please enter the content");
       return;
     }
 
@@ -52,7 +54,7 @@ function AddEditNotes({ noteData, type, onClose,getAllNotes }) {
   return (
     <div className="relative">
       <button
-        className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-500 "
+        className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-500"
         onClick={onClose}
       >
         <MdClose className="text-xl text-slate-400" />
