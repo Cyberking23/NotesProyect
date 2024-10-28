@@ -11,6 +11,7 @@ import EmptyCard from "../../Components/EmptyCard/EmptyCard";
 import axios from "axios";
 import Toast from "../../Components/ToastMessage/Toast";
 import AddNotesImg from "../../images/add-note.svg";
+import NoDataImg from "../../images/no-Data.svg";
 
 function Home() {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -27,6 +28,8 @@ function Home() {
 
   const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
+
+  const [isSearch, setIsSearch] = useState(false);
 
   const navigate = useNavigate();
 
@@ -98,9 +101,51 @@ function Home() {
       console.log("An unexpecter error occurred");
     }
   };
+
+  const onSearchNote = async (query) => {
+    try {
+      const response = await axiosInstance.get("/search-notes", {
+        params: { query },
+      });
+      if (response.data && response.data.notes) {
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updatedIsPinned = async (noteData) => {
+    const noteId = noteData._id;
+    try {
+        const response = await axiosInstance.put("/update-note-pinned/" + noteId, {
+            "isPinned": !noteData.isPinned // Cambia el estado
+        });
+        
+        console.log(response.data); // Verifica la respuesta aquí
+
+        if (response.data && response.data.note) {
+            showToastMessage("Note Updated Successfully");
+            getAllNotes(); // Recarga las notas
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+  const handleClearSearch = () => {
+    setIsSearch(false);
+    getAllNotes();
+  };
+
   return (
     <>
-      <Navbar userInfo={userInfo} />
+      <Navbar
+        userInfo={userInfo}
+        onSearchNote={onSearchNote}
+        handleClearSearch={handleClearSearch}
+      />
 
       <div className="container mx-auto">
         {allNotes.length > 0 ? (
@@ -115,14 +160,18 @@ function Home() {
                 isPinned={item.isPinned}
                 onEdit={() => handleEdit(item)}
                 onDelete={() => deleteNote(item)}
-                onPinNote={() => {}}
+                onPinNote={() => updatedIsPinned(item)}
               />
             ))}
           </div>
         ) : (
           <EmptyCard
-            imgSrc={AddNotesImg}
-            message={`Start creating your first note! Click the Icon to jot down your thoughts,ideas, and reminder,lest get started`}
+            imgSrc={isSearch ? NoDataImg : AddNotesImg}
+            message={
+              isSearch
+                ? `Oops No notes found`
+                : `Start creating your first note! Click the Icon to jot down your thoughts,ideas, and reminder,lest get started`
+            }
           />
         )}
       </div>
