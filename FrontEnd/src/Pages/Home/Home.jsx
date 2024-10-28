@@ -119,20 +119,24 @@ function Home() {
   const updatedIsPinned = async (noteData) => {
     const noteId = noteData._id;
     try {
-        const response = await axiosInstance.put("/update-note-pinned/" + noteId, {
-            "isPinned": !noteData.isPinned // Cambia el estado
-        });
-        
-        console.log(response.data); // Verifica la respuesta aquí
-
-        if (response.data && response.data.note) {
-            showToastMessage("Note Updated Successfully");
-            getAllNotes(); // Recarga las notas
+      const response = await axiosInstance.put(
+        "/update-note-pinned/" + noteId,
+        {
+          isPinned: !noteData.isPinned, // Cambia el estado
         }
+      );
+
+      console.log(response.data); // Verifica la respuesta aquí
+
+      if (response.data && response.data.note) {
+        showToastMessage("Note Pinned Successfully");
+        getAllNotes(); // Recarga las notas
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-}
+};
+
 
   const handleClearSearch = () => {
     setIsSearch(false);

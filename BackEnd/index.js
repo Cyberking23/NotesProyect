@@ -250,7 +250,7 @@ app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
 
 app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
   const noteId = req.params.noteId;
-  const { isPinned } = req.body;
+  const { isPinned } = req.body; // Asegúrate de que este valor sea booleano
   const { user } = req.user;
 
   try {
@@ -260,7 +260,8 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
       return res.status(404).json({ error: true, message: "Note not found" });
     }
 
-    if (isPinned) note.isPinned = isPinned || false;
+    // Asigna el valor de isPinned directamente
+    note.isPinned = isPinned;
 
     await note.save();
 
@@ -276,6 +277,7 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
     });
   }
 });
+
 
 app.get("/search-notes/",authenticateToken,async(req,res)=>{
   const {user}=req.user
