@@ -277,6 +277,8 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
   }
 });
 
+
+
 app.listen(8000);
 
 module.exports = app;
