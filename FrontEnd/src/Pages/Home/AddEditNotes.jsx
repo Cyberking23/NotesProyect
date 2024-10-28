@@ -3,7 +3,7 @@ import TagInput from "../../Components/Input/TagInput";
 import { MdClose } from "react-icons/md";
 import axiosInstance from "../../utils/axiosInstance";
 
-function AddEditNotes({ noteData, type, onClose, getAllNotes }) {
+function AddEditNotes({ noteData, type, onClose, getAllNotes,showToastMessage }) {
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || ""); // Initialize content
   const [tags, setTags] = useState(noteData?.tags || []); // Initialize tags
@@ -18,6 +18,7 @@ function AddEditNotes({ noteData, type, onClose, getAllNotes }) {
         tags,
       });
       if (response.data && response.data.note) {
+        showToastMessage("Note Added Successfully")
         getAllNotes();
         onClose();
       }
@@ -29,7 +30,25 @@ function AddEditNotes({ noteData, type, onClose, getAllNotes }) {
   };
 
   const editNote = async () => {
-    // Your edit logic here
+    const noteId = noteData._id
+    try {
+
+      const response = await axiosInstance.put("/edit-note/" + noteId, {
+        title,
+        content,
+        tags,
+      });
+      if (response.data && response.data.note) {
+        showToastMessage("Note Updated Successfully")
+
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "An unexpected error occurred."
+      );
+    }
   };
 
   const handleAddNote = () => {
